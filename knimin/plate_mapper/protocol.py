@@ -136,6 +136,22 @@ class Protocol(object):
             Position in the protocol list of steps to remove, 0 indexed
         """
 
+    def parents(self):
+        """Returns all protocols that can feed into this one
+
+        Returns
+        -------
+        list of Protocol objects
+        """
+
+    def children(self):
+        """Returns all protocols that can follow this one
+
+        Returns
+        -------
+        list of Protocol objects
+        """
+
 
 class Step(object):
     @classmethod
