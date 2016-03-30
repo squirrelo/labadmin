@@ -1,9 +1,4 @@
 from collections import defaultdict
-survey_type = {
-    1: "Human",
-    2: "Animal"
-}
-
 # Columns to remove for EBI or other public submissions of metadata
 ebi_remove = ['ABOUT_YOURSELF_TEXT', 'ANTIBIOTIC_CONDITION', 'ANTIBIOTIC_MED',
               'BIRTH_MONTH', 'CAT_CONTACT', 'CAT_LOCATION',

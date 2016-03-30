@@ -50,7 +50,7 @@ class KniminConfig(object):
         with open(config_fp, 'U') as conf_file:
             config.readfp(conf_file)
 
-        _expected_sections = {'main', 'postgres', 'tornado', 'email'}
+        _expected_sections = {'main', 'postgres', 'tornado', 'email', 'redcap'}
         if set(config.sections()) != _expected_sections:
             missing = _expected_sections - set(config.sections())
             raise ValueError("Missing sections: %s" % missing)
@@ -59,6 +59,7 @@ class KniminConfig(object):
         self._get_postgres(config)
         self._get_tornado(config)
         self._get_email(config)
+        self._get_redcap(config)
 
     def _get_main(self, config):
         """Get the configuration of the main section"""
@@ -83,3 +84,7 @@ class KniminConfig(object):
         self.smtp_port = config.getint('email', 'PORT')
         self.smtp_user = config.get('email', 'USERNAME')
         self.smtp_password = config.get('email', 'PASSWORD')
+
+    def _get_redcap(self, config):
+        self.redcap_url = config.get('redcap', 'URL')
+        self.redcap_api_key = config.get('redcap', 'API_KEY')

@@ -2054,6 +2054,39 @@ class KniminAccess(object):
                  WHERE barcode IN %s"""
         self._con.execute(sql, [barcodes])
 
+    def get_survey_types(self):
+        """Gets the survey types and instruments attached to it
+
+        Returns
+        -------
+        dict of list of str
+            list of instruments, keyed by sample type
+        """
+        sql = """SELECT survey_type, ARRAY_AGG(redcap_instrument_id)
+                 FROM ag.redcap_instruments
+                 GROUP BY survey_type"""
+        return {s: a for s, a in self._con.execute_fetchall(sql)}
+
+    def get_records_for_barcodes(self, barcodes):
+        """Returns all records for the given barcodes
+
+        Parameters
+        ----------
+        barcodes : list of str
+            Barcodes of interest
+
+        Returns
+        -------
+        list of int
+            Record ids for surveys attached to barcodes
+        """
+        sql = """SELECT DISTINCT redcap_record_id
+                 FROM ag.ag_login_surveys
+                 JOIN ag.ag_kit_barcodes USING (survey_id)
+                 WHERE barcode in %s
+                 ORDER BY redcap_record_id"""
+        return [x[0] for x in self._con.execute_fetchall(sql, tuple(barcodes))]
+
     def _clear_table(self, table, schema):
         """Test helper to wipe out a database table"""
         self._con.execute('DELETE FROM %s.%s' % (schema, table))
