@@ -17,6 +17,14 @@ class TestDataAccess(TestCase):
     def tearDown(self):
         db._clear_table('external_survey_answers', 'ag')
 
+    def test_pulldown(self):
+        barcodes = ['000029429', '000018046', '000023299', '000023300']
+        with open(join(dirname(realpath(__file__)), 'survey_expected.txt'),
+                  'rU') as f:
+            exp = ({1: f.read()}, {})
+        obs = db.pulldown(barcodes)
+        self.assertEqual(obs, exp)
+
     def test_pulldown_third_party(self):
         # Add survey answers
         with open(self.ext_survey_fp, 'rU') as f:
