@@ -40,7 +40,6 @@ def pulldown(barcodes, blanks=None, external=None, full=False):
     """
     # Survey types can cover multiple instruments for multiple languages
     # so make sure we get all the languages covered
-    barcodes_seen = []
     surveys = db.get_survey_types()
     records = db.get_records_for_barcodes(barcodes)
     backbone = pd.DataFrame(db.get_barcode_surveys(barcodes), dtype=str,
@@ -58,18 +57,17 @@ def pulldown(barcodes, blanks=None, external=None, full=False):
             if blanks is not None:
                 blanks_df = pd.DataFrame(
                     index=blanks, columns=df.columns)
-                for col in blanks.columns:
+                for col in blanks_df.columns:
                     blanks_df[col] = [blanks_values[col]] * len(blanks)
                 df = df.append(blanks_df)
         elif survey == 'Animal':
-            df = _format_animal(raw_data, backbone).to_csv(sep='\t')
+            df = _format_animal(raw_data, backbone)
         else:
-            df = _format_basic(raw_data, backbone).to_csv(sep='\t')
+            df = _format_basic(raw_data, backbone)
 
-        barcodes_seen.extend(df.index)
         formatted[survey] = df.to_csv(sep='\t')
 
-    failures = set(barcodes) - set(barcodes_seen)
+    failures = set(barcodes) - set(df.index)
     return formatted, db._explain_pulldown_failures(failures)
 
 

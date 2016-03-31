@@ -1,13 +1,14 @@
 from collections import defaultdict
 # Columns to remove for EBI or other public submissions of metadata
-ebi_remove = ['ABOUT_YOURSELF_TEXT', 'ANTIBIOTIC_CONDITION', 'ANTIBIOTIC_MED',
+ebi_remove = ['ABOUT_YOURSELF_TEXT', 'ANTIBIOTIC_MED',
               'BIRTH_MONTH', 'CAT_CONTACT', 'CAT_LOCATION',
-              'CONDITIONS_MEDICATION', 'DIET_RESTRICTIONS_LIST', 'DOG_CONTACT',
+              'DIET_RESTRICTIONS_LIST', 'DOG_CONTACT',
               'DOG_LOCATION', 'MEDICATION_LIST',
               'OTHER_CONDITIONS_LIST', 'PREGNANT_DUE_DATE', 'RACE_OTHER',
               'RELATIONSHIPS_WITH_OTHERS_IN_STUDY', 'SPECIAL_RESTRICTIONS',
               'SUPPLEMENTS', 'TRAVEL_LOCATIONS_LIST', 'ZIP_CODE',
               'WILLING_TO_BE_CONTACTED']
+# 'ANTIBIOTIC_CONDITION', 'CONDITIONS_MEDICATION'
 
 # Sampling sites for AG
 human_sites = ['Stool',
