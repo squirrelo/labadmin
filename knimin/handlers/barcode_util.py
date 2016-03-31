@@ -4,7 +4,6 @@ from knimin.handlers.base import BaseHandler
 from datetime import datetime
 
 from knimin import db
-from knimin.lib.constants import survey_type
 from knimin.lib.mail import send_email
 
 
@@ -35,13 +34,13 @@ class BarcodeUtilHelper(object):
                 div_id = "no_metadata"
                 message = "Cannot retrieve metadata: %s" % failures[barcode]
                 ag_details['email_type'] = "-1"
-            elif survey_type[survey_id] == 'Human':
+            elif survey_id == 'Human':
                 # and we can successfully retrieve sample
                 # metadata
                 div_id = "verified"
                 message = "All good"
                 ag_details['email_type'] = "1"
-            elif survey_type[survey_id] == 'Animal':
+            elif survey_id == 'Animal':
                 div_id = "verified_animal"
                 message = "All good"
                 ag_details['email_type'] = "1"

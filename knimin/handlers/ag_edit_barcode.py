@@ -2,6 +2,7 @@
 from tornado.web import authenticated
 from knimin.handlers.base import BaseHandler
 
+from knimin.lib.constants import human_sites, general_sites
 from knimin import db
 
 
@@ -11,8 +12,8 @@ class AGEditBarcodeHandler(BaseHandler):
         barcode = self.get_argument('barcode', None)
         if barcode is not None:
             details = db.getAGBarcodeDetails(barcode)
-            site_sampled = db.human_sites
-            environment_sampled = db.general_sites
+            site_sampled = human_sites
+            environment_sampled = general_sites
             logins = db.getAGKitsByLogin()
             self.render("ag_edit_barcode.html", response=None, barcode=barcode,
                         sites_sampled=site_sampled, details=details,

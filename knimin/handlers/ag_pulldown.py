@@ -4,6 +4,7 @@ from future.utils import viewitems
 from knimin.handlers.base import BaseHandler
 from knimin import db
 from knimin.lib.mem_zip import InMemoryZip
+from knimin.lib.redcap_interaction import pulldown
 
 
 class AGPulldownHandler(BaseHandler):
@@ -52,7 +53,7 @@ class AGPulldownDLHandler(BaseHandler):
         else:
             external = []
         # Get metadata and create zip file
-        metadata, failures = db.pulldown(barcodes, blanks, external)
+        metadata, failures = pulldown(barcodes, blanks, external)
 
         meta_zip = InMemoryZip()
         failed = '\n'.join(['\t'.join(bc) for bc in viewitems(failures)])

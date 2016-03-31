@@ -8,6 +8,38 @@ ebi_remove = ['ABOUT_YOURSELF_TEXT', 'ANTIBIOTIC_CONDITION', 'ANTIBIOTIC_MED',
               'RELATIONSHIPS_WITH_OTHERS_IN_STUDY', 'SPECIAL_RESTRICTIONS',
               'SUPPLEMENTS', 'TRAVEL_LOCATIONS_LIST', 'ZIP_CODE',
               'WILLING_TO_BE_CONTACTED']
+
+# Sampling sites for AG
+human_sites = ['Stool',
+               'Mouth',
+               'Right hand',
+               'Left hand',
+               'Forehead',
+               'Nares',
+               'Hair',
+               'Tears',
+               'Nasal mucus',
+               'Ear wax',
+               'Vaginal mucus']
+
+animal_sites = ['Stool',
+                'Mouth',
+                'Nares',
+                'Ears',
+                'Skin',
+                'Fur']
+
+general_sites = ['Animal Habitat',
+                 'Biofilm',
+                 'Dust',
+                 'Food',
+                 'Fermented Food',
+                 'Indoor Surface',
+                 'Outdoor Surface',
+                 'Plant habitat',
+                 'Soil',
+                 'Sole of shoe',
+                 'Water']
 # standard fields that are set based on sampling site
 md_lookup = {
     'Hair':
