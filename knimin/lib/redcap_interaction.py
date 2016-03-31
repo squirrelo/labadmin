@@ -44,8 +44,8 @@ def pulldown(barcodes, blanks=None, external=None, full=False):
     surveys = db.get_survey_types()
     records = db.get_records_for_barcodes(barcodes)
     backbone = pd.DataFrame(db.get_barcode_surveys(barcodes), dtype=str,
-                            columns=['survey_id', 'barcode'])
-    backbone.set_index('survey_id', drop=False)
+                            columns=['SURVEY_ID', 'BARCODE'])
+    backbone.set_index('SURVEY_ID', drop=False, inplace=True)
 
     formatted = {}
     for survey in surveys:
@@ -103,13 +103,13 @@ def _batch_grab(instruments, records, batch_size=100):
 
     response = []
     try:
-        # Record IDs must be strings for this library, so convert from longs
+        # Record IDs must be strings for this library, so explicit convert
+        # since stored as longs
         for record_chunk in chunks(map(str, records), batch_size):
-            print record_chunk
-            print instruments
             chunked_response = ag_redcap.export_records(
                 records=record_chunk, forms=instruments, format='df',
-                export_survey_fields=True)
+                export_survey_fields=True, raw_or_label='label',
+                df_kwargs={'dtype': 'str'})
             response.append(chunked_response)
     except RedcapError:
         msg = "Batched export failed for batch_size={:d}".format(batch_size)
@@ -120,6 +120,8 @@ def _batch_grab(instruments, records, batch_size=100):
     for chunk in response[1:]:
         full_df.append(chunk)
     full_df.columns = [c.upper() for c in full_df.columns]
+    full_df.set_index('SURVEY_ID', inplace=True)
+    full_df.fillna('Unspecified', inplace=True)
     return full_df
 
 
@@ -128,15 +130,20 @@ def _geolocate(data, full):
     zip_lookup = db.get_zipcodes(full)
     country_lookup = db.get_countries()
     for index, row in data.iterrows():
-        zipcode = row['ZIP_CODE'].upper()
+        zipcode = unicode(row['ZIP_CODE']).upper()
         country = row['COUNTRY']
+
         geolocated[index] = {}
+        try:
+            geolocated[index]['COUNTRY'] = country_lookup[country]
+        except KeyError:
+            geolocated[index]['COUNTRY'] = country
+
         try:
             geolocated[index]['LATITUDE'] = zip_lookup[zipcode][country][0]
             geolocated[index]['LONGITUDE'] = zip_lookup[zipcode][country][1]
             geolocated[index]['ELEVATION'] = zip_lookup[zipcode][country][2]
             geolocated[index]['STATE'] = zip_lookup[zipcode][country][3]
-            geolocated[index]['COUNTRY'] = country_lookup[country]
         except KeyError:
             # geocode unknown zip/country combo and add to
             # zipcode table & lookup dict
@@ -178,7 +185,9 @@ def _geolocate(data, full):
             data['ECONOMIC_REGION'] = 'Unspecified'
 
     # Combine geolocation data with existing dataframe
-    return data.join(pd.DataFrame.from_dict(geolocated, orient='index'))
+    del data['COUNTRY']
+    geo_df = pd.DataFrame.from_dict(geolocated, orient='index')
+    return data.join(geo_df)
 
 
 def _format_human(data, backbone, external=None, full=False):
@@ -225,12 +234,12 @@ def _format_human(data, backbone, external=None, full=False):
     # Add categorization and correction columns
     data['ALCOHOL_CONSUMPTION'] = data['ALCOHOL_FREQUENCY'].apply(
         categorize_etoh)
-    data['BMI_CAT'] = data['BMI'].apply(categorize_bmi)
     data['BMI_CORRECTED'] = data['BMI'].apply(correct_bmi)
-    data['AGE_CAT'] = data['AGE_CORRECTED'].apply(categorize_age)
-    data['AGE_CORRECTED'] = np.vectorize(correct_age, otypes=str)(
+    data['BMI_CAT'] = data['BMI_CORRECTED'].apply(categorize_bmi)
+    data['AGE_CORRECTED'] = np.vectorize(correct_age, otypes=[str])(
         data['AGE_YEARS'], data['HEIGHT_CM'], data['WEIGHT_KG'],
         data['ALCOHOL_CONSUMPTION'])
+    data['AGE_CAT'] = data['AGE_CORRECTED'].apply(categorize_age)
 
     # Add subset columns (All boolean)
     data['SUBSET_AGE'] = data['AGE_YEARS'].apply(
@@ -243,9 +252,17 @@ def _format_human(data, backbone, external=None, full=False):
         lambda x: x == 'I have not taken antibiotics in the past year.')
     data['SUBSET_BMI'] = data['BMI'].apply(
         lambda x: x != 'Unspecified' and 18.5 <= x < 30)
-    data['SUBSET_HEALTHY'] = np.vectorize(lambda *args: all(args), otypes=str)(
+    data['SUBSET_HEALTHY'] = np.vectorize(
+        lambda *args: all(args), otypes=[str])(
         data['SUBSET_AGE'], data['SUBSET_DIABETES'], data['SUBSET_IBD'],
         data['SUBSET_ANTIBIOTIC_HISTORY'], data['SUBSET_BMI'])
+
+    # Address birthday issue
+    data['BIRTH_MONTH'] = [x.split('-')[1] if x != 'Unspecified' else x
+                           for x in data['BIRTH_DATE']]
+    data['BIRTH_YEAR'] = [x.split('-')[0] if x != 'Unspecified' else x
+                          for x in data['BIRTH_DATE']]
+    del data['BIRTH_DATE']
 
     # Add external surveys, if needed
     if external is not None:
@@ -254,14 +271,16 @@ def _format_human(data, backbone, external=None, full=False):
             data.join(ext, how='left')
 
     # Combine the backbone and data to get dataframe keyed to barcodes
-    combined = backbone.join(data, how='inner')
-    combined.set_index('BARCODE')
+    combined = backbone.join(data)
+    print combined.index
+    combined = combined.loc[data.index]
+    combined.set_index('BARCODE', inplace=True)
     combined['ANONYMIZED_NAME'] = list(combined.index)
 
     bc_details = db.get_ag_barcode_details(list(combined.index))
     for barcode, row in combined.iterrows():
         bc_info = bc_details[barcode]
-        site = bc_info['SITE_SAMPLED']
+        site = bc_info['site_sampled']
 
         combined.loc[barcode, 'COLLECTION_SEASON'] = season_lookup[
             bc_info['sample_date'].month]
@@ -337,9 +356,9 @@ def _format_animal(data, backbone):
     data['REQUIRED_SAMPLE_INFO_STATUS'] = ['completed'] * num_rows
 
     # Combine the backbone and data to get dataframe keyed to barcodes
-    combined = backbone.join(data, how='inner')
-    combined.set_index('BARCODE')
-    data['ANONYMIZED_NAME'] = list(combined.index)
+    combined = backbone.join(data)
+    combined.set_index('BARCODE', inplace=True)
+    combined['ANONYMIZED_NAME'] = list(combined.index)
     return combined
 
 

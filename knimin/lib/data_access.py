@@ -321,6 +321,7 @@ class KniminAccess(object):
         country_lookup = dict(self._con.execute_fetchall(country_sql))
         # Add for scrubbed testing database
         country_lookup['REMOVED'] = 'REMOVED'
+        return country_lookup
 
     def participant_names(self):
         """Retrieve the participant names for the given barcodes

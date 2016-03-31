@@ -277,7 +277,7 @@ def categorize_etoh(x):
     elif isinstance(x, str):
         etoh_cat = "Yes"
     else:
-        raise TypeError('Must pass string, passed %s' % type(x))
+        raise TypeError('Must pass string, passed %s: %s' % (type(x), str(x)))
 
     return etoh_cat
 
