@@ -7,7 +7,7 @@ from util import (categorize_age, categorize_etoh, categorize_bmi, correct_age,
                   correct_bmi)
 from constants import (md_lookup, month_str_lookup,
                        regions_by_state, blanks_values, season_lookup,
-                       ebi_remove)
+                       ebi_remove, redcap_remove)
 from knimin import config, db
 
 ag_redcap = Project(config.redcap_url, config.redcap_api_key)
@@ -107,7 +107,7 @@ def _batch_grab(instruments, records, batch_size=100):
             chunked_response = ag_redcap.export_records(
                 records=record_chunk, forms=instruments, format='df',
                 export_survey_fields=True, raw_or_label='label',
-                df_kwargs={'dtype': 'str'})
+                df_kwargs={'dtype': 'str'}, export_checkbox_labels=True)
             response.append(chunked_response)
     except RedcapError:
         msg = "Batched export failed for batch_size={:d}".format(batch_size)
@@ -270,7 +270,6 @@ def _format_human(data, backbone, external=None, full=False):
 
     # Combine the backbone and data to get dataframe keyed to barcodes
     combined = backbone.join(data)
-    print combined.index
     combined = combined.loc[data.index]
     combined.set_index('BARCODE', inplace=True)
     combined['ANONYMIZED_NAME'] = list(combined.index)
@@ -317,6 +316,7 @@ def _format_human(data, backbone, external=None, full=False):
         combined.loc[barcode, 'BODY_PRODUCT'] = md_lookup[site]['BODY_PRODUCT']
         combined.loc[barcode, 'DESCRIPTION'] = md_lookup[site]['DESCRIPTION']
 
+    combined.drop(redcap_remove, axis=1, inplace=True)
     if not full:
         combined.drop(ebi_remove, axis=1, inplace=True)
     return combined

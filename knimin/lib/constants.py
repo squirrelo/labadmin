@@ -10,6 +10,11 @@ ebi_remove = ['ABOUT_YOURSELF_TEXT', 'ANTIBIOTIC_MED',
               'WILLING_TO_BE_CONTACTED']
 # 'ANTIBIOTIC_CONDITION', 'CONDITIONS_MEDICATION'
 
+# Columns added by redcap that need to be removed
+redcap_remove = ['RECORD_ID', 'REDCAP_EVENT_NAME', 'REDCAP_SURVEY_IDENTIFIER',
+                 'TEST_COMPLETE', 'AGHUMANENUS_TIMESTAMP', 'AG_LOGIN_ID',
+                 'PARTICIPANT_NAME', 'PORTAL']
+
 # Sampling sites for AG
 human_sites = ['Stool',
                'Mouth',
