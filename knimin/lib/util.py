@@ -233,26 +233,27 @@ def categorize_age(x):  # noqa
 def correct_age(age, height, weight, etoh):
     """Infers incorrect ages and incorrectly classified babies"""
     # Make sure all required data exists
-    if any([age == 'Unspecified', height == 'Unspecified',
-            weight == 'Unspecified', etoh == 'Unspecified']):
+    if age == 'Unspecified':
         return 'Unspecified'
-
-    # Explicit conversion needed in case string passed in
     new_age = float(age)
-    new_height = float(height)
-    new_weight = float(weight)
     # Checks the logic for age (only check ages 0-2, 'baby' definition)
     if new_age >= 3 and new_age < 123:
         return new_age
     if new_age < 0 or new_age >= 123:
         return 'Unspecified'
 
-    # Checks the logic for height (in cm)
-    if new_height > 91.4:
-        return 'Unspecified'
-    # Checks the logic for weight (in kg)
-    if new_weight > 16.3:
-        return 'Unspecified'
+    if height != 'Unspecified':
+        new_height = float(height)
+        # Checks the logic for height (in cm)
+        if new_height > 91.4:
+            return 'Unspecified'
+
+    if weight != "Unspecified":
+        new_weight = float(weight)
+        # Checks the logic for weight (in kg)
+        if new_weight > 16.3:
+            return 'Unspecified'
+
     # Checks the logic for alcohol
     if etoh != 'Never':
         return 'Unspecified'
