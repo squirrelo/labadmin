@@ -1342,6 +1342,27 @@ class KniminAccess(object):
 
         return kits
 
+    def delete_ag_kits(self, email, kit_ids):
+        """Remove handout kits from the server
+
+        Parameters
+        ----------
+        email : str
+            Email of the user requesting the delete. Not strictly needed, but
+            asked for as a safety measure
+        kit_ids : list of str
+            Kits to delete
+        """
+        if not self.has_access(email, ['Admin', 'Create AG kits']):
+            raise ValueError('User %s does not have delete permissions!' %
+                             email)
+
+        bc_sql = "DELETE FROM ag.ag_handout_barcodes WHERE kit_id in %s"
+        kit_sql = "DELETE FROM ag.ag_handout_kits WHERE kit_id in %s"
+        kits = tuple(kit_ids)
+        self._con.execute(bc_sql, [kits])
+        self._con.execute(kit_sql, [kits])
+
     def get_used_kit_ids(self):
         """Grab in use kit IDs, return set of them
         """

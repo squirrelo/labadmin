@@ -21,12 +21,20 @@ $(document).ready(function () {
       {
         extend: 'selected',
         text: 'Delete Kits',
-        action: function (e, dt, button, config) { console.log('DELETING!'); }
-      },
-      {
-        extend: 'selected',
-        text: 'Download kit printouts',
-        action: function (e, dt, button, config) { console.log('REPRINT!'); }
+        action: function (e, dt, button, config) {
+          var kits = [];
+          dt.rows({ selected: true }).every(function() {
+            kits.push(this.data()[0]);
+          });
+          $.post('/ag_view_handout/', {kits: JSON.stringify(kits)})
+            .done(function(data) {
+              if (data == 'Success') {
+                history.go(0);
+              } else {
+                alert(data);
+              }
+            });
+        }
       }
     ]
   });
