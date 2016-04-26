@@ -1,0 +1,48 @@
+{% extends auth_sitebase.html %}
+{% block head %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/t/dt/jszip-2.5.0,dt-1.10.11,b-1.1.2,b-html5-1.1.2,se-1.1.2/datatables.min.css"/>
+<script type="text/javascript" src="https://cdn.datatables.net/t/dt/jszip-2.5.0,dt-1.10.11,b-1.1.2,b-html5-1.1.2,se-1.1.2/datatables.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function () {
+  $("#handout-table").DataTable({
+    dom: 'Bfrtip',
+    pageLength: 50,
+    "order": [[ 4, "desc" ]],
+    "columns": [
+      null,
+      null,
+      null,
+      { "width": "50%" },
+      null
+    ],
+    select: true,
+    buttons: [
+      'excel',
+      {
+        extend: 'selected',
+        text: 'Delete Kits',
+        action: function (e, dt, button, config) { console.log('DELETING!'); }
+      },
+      {
+        extend: 'selected',
+        text: 'Download kit printouts',
+        action: function (e, dt, button, config) { console.log('REPRINT!'); }
+      }
+    ]
+  });
+});
+</script>
+{% end %}
+{% block content %}
+<h3>Handout Kit Review</h3>
+<table id="handout-table">
+  <thead>
+    <tr><td>Kit ID</td><td>Verification Code</td><td>Swabs per kit</td><td>Barcodes</td><td>Created On</td></tr>
+  </thead>
+  <tbody>
+  {% for kit in kits %}
+  <tr><td>{{ kit['kit_id'] }}</td><td>{{ kit['verification_code'] }}</td><td>{{ kit['swabs_per_kit'] }}</td><td>{% raw ', '.join(kit['barcodes']) %}</td><td>{{ kit['created_on'].strftime('%Y-%m-%d %I:%M %p') }}</td></tr>
+  {% end %}
+  </tbody>
+</table>
+{% end %}

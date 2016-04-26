@@ -2008,6 +2008,32 @@ class KniminAccess(object):
         liketerm = '%%' + term + '%%'
         return self._con.execute_fetchdict(sql, [liketerm, liketerm])
 
+    def get_handout_kits(self, kit_ids=None):
+        """Gets information on handout kits
+
+        Parameters
+        ----------
+        kit_ids : list of str, optional
+            List of kits to get info for. Default all handout kits
+
+        Returns
+        -------
+        list of dicts of objects
+            Each kit as a dict with all available info. Barcodes are a list
+            under the barcode key.
+        """
+        sql = """SELECT kit_id, verification_code, swabs_per_kit, created_on,
+                 array_agg(barcode) as barcodes
+                 FROM ag.ag_handout_kits
+                 JOIN ag.ag_handout_barcodes USING (kit_id)"""
+        sql_args = None
+        if kit_ids is not None:
+            sql += 'WHERE kit_ids IN %s'
+            sql_args = [tuple(kit_ids)]
+        sql += ' GROUP BY kit_id, verification_code, swabs_per_kit, created_on'
+
+        return self._con.execute_fetchdict(sql, sql_args)
+
     def get_login_by_email(self, email):
         sql = """SELECT name, address, city, state, zip, country, ag_login_id
                  FROM ag_login WHERE email = %s"""

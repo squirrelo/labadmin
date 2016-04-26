@@ -32,6 +32,7 @@ from knimin.handlers.ag_third_party import (AGThirdPartyHandler,
 from knimin.handlers.ag_consent_check import AGConsentCheckHandler
 from knimin.handlers.projects_summary import ProjectsSummaryHandler
 from knimin.handlers.access_control import AGEditAccessHandler
+from knimin.handlers.ag_view_handout import AGViewHandoutHandler
 define("port", default=config.http_port, type=int)
 
 
@@ -61,6 +62,7 @@ class WebApplication(Application):
             (r"/ag_edit_kit/", AGEditKitHandler),
             (r"/ag_new_barcode/", AGNewBarcodeHandler),
             (r"/ag_update_geocode/", AGUpdateGeocodeHandler),
+            (r"/ag_view_handout/", AGViewHandoutHandler),
             (r"/update_ebi/", UpdateEBIStatusHandler),
             (r"/ag_edit_barcode/", AGEditBarcodeHandler),
             (r"/ag_pulldown/", AGPulldownHandler),
