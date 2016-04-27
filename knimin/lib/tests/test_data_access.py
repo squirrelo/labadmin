@@ -60,6 +60,11 @@ class TestDataAccess(TestCase):
         exp = ['000014660', datetime.date(2015, 3, 25), 'REMOVED']
         self.assertEqual(obs[0], exp)
 
+    def test_get_handout_kits(self):
+        obs = db.get_handout_kits()
+        self.assertEqual(obs[0].keys(), ['kit_id', 'barcodes', 'created_on',
+                                         'swabs_per_kit', 'verification_code'])
+
 
 if __name__ == "__main__":
     main()
