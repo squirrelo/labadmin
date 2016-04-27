@@ -18,7 +18,6 @@ class AGViewHandoutHandler(BaseHandler):
     @authenticated
     def post(self):
         kits = loads(self.get_argument('kits'))
-        print kits
         try:
             db.delete_ag_kits(self.current_user, kits)
         except Exception as e:

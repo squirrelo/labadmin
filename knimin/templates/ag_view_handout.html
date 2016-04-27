@@ -26,14 +26,17 @@ $(document).ready(function () {
           dt.rows({ selected: true }).every(function() {
             kits.push(this.data()[0]);
           });
-          $.post('/ag_view_handout/', {kits: JSON.stringify(kits)})
-            .done(function(data) {
-              if (data == 'Success') {
-                history.go(0);
-              } else {
-                alert(data);
-              }
-            });
+
+          if (confirm("Are you sure you want to delete " + kits.length + " kits?")) {
+            $.post('/ag_view_handout/', {kits: JSON.stringify(kits)})
+              .done(function(data) {
+                if (data == 'Success') {
+                  history.go(0);
+                } else {
+                  alert(data);
+                }
+              });
+          }
         }
       }
     ]
