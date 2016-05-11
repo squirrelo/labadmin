@@ -36,7 +36,6 @@
             {% if admin or db.has_access(current_user, ['AG kits']) %}
             <li><a href="/ag_new_kit/">Add New AG kits</a></li>
             <li><a href="/ag_add_barcode_kit/">Add Barcodes to AG Kits</a></li>
-            <li><a href="/ag_view_handout/">View/edit AG handout kits</a></li>
             {% end %}
             {% if admin or db.has_access(current_user, ['External surveys'])%}
             <li><a href="/ag_third_party/add/">Add External Survey</a></li>
@@ -46,6 +45,7 @@
             <li><a href="/ag_pulldown/">Metadata Pulldown</a></li>
             {% end %}
             {% if admin %}
+            <li><a href="/ag_view_handout/">View/edit AG handout kits</a></li>
             <li><a href="/ag_participant_names/">Participant Names</a></li>
             {% end %}
         </ul>
