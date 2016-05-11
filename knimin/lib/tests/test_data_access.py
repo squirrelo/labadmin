@@ -65,6 +65,16 @@ class TestDataAccess(TestCase):
         self.assertEqual(obs[0].keys(), ['kit_id', 'barcodes', 'created_on',
                                          'swabs_per_kit', 'verification_code'])
 
+    def test_search_kits(self):
+        obs = db.search_kits('tst_IueFX')
+        self.assertEqual(['ded5101d-c8e3-f6b3-e040-8a80115d6f03'], obs)
+
+        obs = db.search_kits('e1934dfe-8537-6dce-e040-8a80115d2da9')
+        self.assertEqual(['e1934ceb-6e92-c36a-e040-8a80115d2d64'], obs)
+
+        obs = db.search_kits('000001124')
+        self.assertEqual([], obs)
+
 
 if __name__ == "__main__":
     main()

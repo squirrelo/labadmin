@@ -104,8 +104,7 @@ class BarcodeUtilHelper(object):
         subject = body_message = ""
 
         if email_type == '0':
-            subject = ('Follow up on Your American Gut Sample with '
-                       'Barcode %s' % barcode)
+            subject = 'ACTION REQUIRED - Assign your samples in American Gut'
             body_message = """
 Dear {name},
 
@@ -278,7 +277,9 @@ class BarcodeUtilHandler(BaseHandler, BarcodeUtilHelper):
         email_msg = ag_update_msg = project_msg = None
         exisiting_proj, parent_project = db.getBarcodeProjType(
             barcode)
-        exisiting_proj = set(exisiting_proj.split(','))
+        # This WILL NOT let you remove a sample from being in AG if it is
+        # part of AG to begin with
+        exisiting_proj = set(exisiting_proj.split(', '))
         if exisiting_proj != projects:
             try:
                 add_projects = projects.difference(exisiting_proj)
